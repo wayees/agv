@@ -17,11 +17,12 @@ node('haimaxy-jnlp') {
         sh "docker build -t wayees/jenkins-demo:${build_tag} ."
     }
     stage('Push') {
-        echo "4.Push Docker Image Stage"        
-        sh "docker login -u ${dockerHubUser} -p ${dockerHubPassword}"
-        sh "docker push  wayees/jenkins-demo:${build_tag}"
-        sh "docker logout"
-        
+        echo "4.Push Docker Image Stage"
+        withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+            sh "docker login -u ${dockerHubUser} -p ${dockerHubPassword}"
+            sh "docker push wayees/jenkins-demo:${build_tag}"
+            sh "docker logout"
+        }
     }
     stage('Deploy') {
         echo "5. Deploy Stage"
